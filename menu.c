@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<conio.h>
 #include<string.h>
+//#include<unistd.h>
 #include<windows.h>
 
 struct dish
@@ -13,6 +14,8 @@ struct dish
 struct bill
 {
     int bill_no;
+    int table_no;
+    int status;
     struct dish dishes[10];
     int total_bill;
 };
@@ -20,13 +23,21 @@ struct bill
 void display_menu(struct bill*,int);
 int create_menu(struct bill*, int);
 void create_order(struct bill*, struct bill*, int);
+int check_table(struct bill*, struct bill*);
+//void login(struct bill*)
 
 int main()
 {
-    struct bill menu,order[10];
-    struct bill *menup = &menu,*orderp = &order[0];
+    struct bill menu,table[5];
+    struct bill *menup = &menu,*tablep = &table[0];
 
-    int n;
+    
+    int n,i;
+
+    for(i=0;i<5;i++)
+    {
+        table[i].status = 0;
+    }
     char password[10] = "password";
     printf("Loggin in as admin...\n");
     while(1){
@@ -41,13 +52,14 @@ int main()
             printf("Please try again\n");
         }
     }
-    Sleep(1000);
+    Sleep(2000);
     system("cls");
     printf("Creating menu...\n");
-    Sleep(1000);
+    Sleep(2000);
+    table[0].status = 1;
 
     create_menu(menup,5);
-    create_order(menup,orderp,5);
+    check_table(menup, tablep);
 }
 
 void display_menu(struct bill* menup,int num_of_items)
@@ -73,6 +85,7 @@ int create_menu(struct bill* menup, int itemNum)
         {
             //gets(dish);
             //printf("%d\n",i);
+            
             scanf("%s %d",dish,&menup->dishes[i].price);
             strcpy(menup->dishes[i].name,dish);
         }
@@ -83,13 +96,15 @@ int create_menu(struct bill* menup, int itemNum)
     }while(check == 'n');
 }
 
-void create_order(struct bill* menup, struct bill* orderp,int itemNum)
+void create_order(struct bill* menup, struct bill* tablep,int itemNum)
 {
     char check = 'n';
     int input,i;
     system("cls");
-    orderp->bill_no = rand()%100+1;
-    printf("Your Bill no is: %d\n",orderp->bill_no);
+    tablep->status = 1;
+    tablep->bill_no = rand()%100+1;
+    printf("Your Bill no is: %d\n",tablep->bill_no);
+    printf("\n\e[1mPlease keep note of your bill number.\e[m\n");
     while(check == 'n')
     {
         display_menu(menup,5);
@@ -97,13 +112,42 @@ void create_order(struct bill* menup, struct bill* orderp,int itemNum)
         printf("Please enter 0 when you are done\n");
         for(i=0;input!=0;i++)
         {
-            orderp->dishes[i-1].price = menup->dishes[input-1].price;
-            strcpy(orderp->dishes[i-1].name,menup->dishes[input-1].name);
+            
+            tablep->dishes[i-1].price = menup->dishes[input-1].price;
+            strcpy(tablep->dishes[i-1].name,menup->dishes[input-1].name);
             scanf("%d",&input);
         }
         i--;
-        display_menu(orderp,i);
+        printf("\e[1mThis is your order: \e[m\n");
+        display_menu(tablep,i);
         printf("\nfinalize? (y/n)\n");
         scanf("\n%c",&check);
+    }
+}
+
+int check_table(struct bill* menup, struct bill* tablep)
+{
+    int i;
+    int check = 0;
+    for(i=0;i<5;i++)
+    {
+        if((tablep+i)->status==1)
+            continue;
+        else
+        {
+            check = 1;
+            break;
+        }
+    }
+    if(check == 1)
+    {
+        printf("Table %d is free!\n",i+1);
+        tablep->table_no = i+1;
+        Sleep(2000);
+        create_order(menup,tablep+i,5);
+    }
+    else
+    {
+        printf("All tables are currently full, please wait for some time");
     }
 }
