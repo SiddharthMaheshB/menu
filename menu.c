@@ -4,6 +4,7 @@
 #include<string.h>
 //#include<unistd.h>
 #include<windows.h>
+#include<ctype.h>
 
 struct dish
 {
@@ -20,11 +21,14 @@ struct bill
     int total_bill;
 };
 
+int menu_status = 0;
+
 void display_menu(struct bill*,int);
 int create_menu(struct bill*, int);
 void create_order(struct bill*, struct bill*, int);
 int check_table(struct bill*, struct bill*);
-//void login(struct bill*)
+void initialise(struct bill*,struct bill*);
+void admin_login(struct bill*, struct bill*);
 
 int main()
 {
@@ -33,33 +37,15 @@ int main()
 
     
     int n,i;
+    char table_no;
 
-    for(i=0;i<5;i++)
-    {
-        table[i].status = 0;
-    }
-    char password[10] = "password";
-    printf("Loggin in as admin...\n");
-    while(1){
-        printf("Enter Password: ");
-        scanf("%s",password);
-        if(!strcmp(password,"password"))
-        {
-            printf("Successful login!\n");
-            break;
-        }
-        else{
-            printf("Please try again\n");
-        }
-    }
-    Sleep(2000);
-    system("cls");
-    printf("Creating menu...\n");
-    Sleep(2000);
-    table[0].status = 1;
+    
+    
+    admin_login(menup,tablep);
+    //create_menu(menup, 5);
+    //check_table(menup,tablep);
+    
 
-    create_menu(menup,5);
-    check_table(menup, tablep);
 }
 
 void display_menu(struct bill* menup,int num_of_items)
@@ -94,6 +80,7 @@ int create_menu(struct bill* menup, int itemNum)
         printf("finalize? (y/n)");
         scanf("\n%c",&check);
     }while(check == 'n');
+    menu_status = 1;
 }
 
 void create_order(struct bill* menup, struct bill* tablep,int itemNum)
@@ -149,5 +136,71 @@ int check_table(struct bill* menup, struct bill* tablep)
     else
     {
         printf("All tables are currently full, please wait for some time");
+    }
+}
+
+void initialise(struct bill* menup,struct bill* tablep)
+{
+    char table_no;
+    int i;
+
+    //setting all tables status to unoccupied
+    for(i=0;i<5;i++)
+    {
+        (tablep+i)->status = 0;
+    }
+
+    //log in to tables system
+    printf("Please enter your table number(if new, please enter 0)(if admin, please enter a):\n");
+    scanf("%c",&table_no);
+    if(table_no == 'a')
+    {  
+        admin_login(menup,tablep);
+    }
+    else
+    {
+        if(menu_status == 1)            //checks if menu has been created or not
+        {
+            if((tablep + (((int)table_no)-49))->status == 1)
+            {
+                printf("Table no: %d",(int)table_no-48);
+                //table_no(tablep+((int)table_no)-1);
+            }
+            else if(((int)table_no) == 48)
+            {
+                printf("Logging in as a new customer...");
+                Sleep(1000);
+                check_table(menup, tablep);
+            }
+            else
+            {
+                printf("Please enter valid table number");
+            }
+        }
+        else
+        {
+            printf("The restaurant hasn't opened yet, please wait.");
+        }
+    }
+    
+}
+
+void admin_login(struct bill* menup, struct bill* tablep)
+{
+    char password[10] = "password";
+    //int i;
+    printf("Loggin in as admin...\n");
+    while(1){
+        printf("Enter Password: ");
+        scanf("%s",password);
+        
+        if(!strcmp(password,"password"))
+        {
+            printf("Successful login!\n");
+            break;
+        }
+        else{
+            printf("Please try again\n");
+        }
     }
 }
