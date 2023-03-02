@@ -44,13 +44,13 @@ void cust(struct bill*, struct bill*);
 void display_bill(struct bill*, struct bill*);
 void view_table(struct bill*, struct bill*);
 void cust_login(struct bill*, struct bill*);
-
+void checkout(struct bill*, struct bill*);
 
 int main()
 {
     struct bill menu,table[5];
     struct bill *menup = &menu,*tablep = &table[0];
-    initialise(menup,tablep);
+    initialise(menup,tablep);    
 }
 
 
@@ -337,6 +337,7 @@ void display_bill(struct bill* menup, struct bill* tablep)
 {
     int i,j;
     int quantity=1,sum=0,sno=1,rep=0;
+    char yesno;
     printf("S.no Dish                  Cost  Quantity\n");
     for(i=0;i<tablep->total_dishes;i++)
     {
@@ -371,6 +372,9 @@ void display_bill(struct bill* menup, struct bill* tablep)
         
     }
     printf("\n\e[1mTotal amount: %d\e[m",sum);
+
+    checkout(menup,tablep);
+    login(menup,tablep);
 }
 
 void view_table(struct bill* menup, struct bill* tablep)
@@ -404,4 +408,23 @@ void cust_login(struct bill* menup, struct bill* tablep)
     printf("Too many incorrect attempts. Logging out...\n");
     Sleep(1000);
     login(menup,tablep-(tablep->table_no + 1));
+}
+
+void checkout(struct bill* menup,struct bill* tablep)
+{
+    char yesno;
+    printf("\nWould you like to pay now? (y/n) ");
+    scanf("\n%c",&yesno);
+    if(yesno == 'n')
+    {
+        printf("Going back to menu...\n");
+        Sleep(1000);
+        cust(menup,tablep);
+    }
+    else if(yesno == 'y')
+    {
+        printf("Thank you for eating at our restaurant");
+        checkout(menup,tablep);
+    }
+    tablep->status = 0;
 }
