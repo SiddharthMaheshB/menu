@@ -1,3 +1,10 @@
+/*TO DO:
+pay?
+
+BUGS: 
+3rd new customer is taken as an existing customer for no reason at all
+*/
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<conio.h>
@@ -34,20 +41,16 @@ void edit_order(struct bill*, struct bill*);
 void login(struct bill*, struct bill*);
 void admin(struct bill*, struct bill*);
 void cust(struct bill*, struct bill*);
+void display_bill(struct bill*, struct bill*);
+void view_table(struct bill*, struct bill*);
+void cust_login(struct bill*, struct bill*);
 
 
 int main()
 {
     struct bill menu,table[5];
     struct bill *menup = &menu,*tablep = &table[0];
-
-    
-
-    
-    
-    login(menup,tablep);
-    
-
+    initialise(menup,tablep);
 }
 
 
@@ -119,7 +122,7 @@ void create_order(struct bill* menup, struct bill* tablep)
         printf("\nfinalize? (y/n)\n");
         scanf("\n%c",&check);
     }
-    login(menup,tablep);
+    cust(menup,tablep);
 }
 
 int check_table(struct bill* menup, struct bill* tablep)
@@ -160,9 +163,7 @@ void initialise(struct bill* menup,struct bill* tablep)
     {
         (tablep+i)->status = 0;
     }
-
-    
-    
+    login(menup,tablep);
 }
 
 void admin_login(struct bill* menup, struct bill* tablep)
@@ -209,9 +210,10 @@ void edit_order(struct bill* menup, struct bill* tablep)
         printf("\nfinalize? (y/n)\n");
         scanf("\n%c",&check);
     }
+    cust(menup,tablep);
 }
 
-void login(struct bill* menup,struct bill* tablep)
+void login(struct bill* menup,struct bill* tablep)  
 {
 
     //log in to tables system
@@ -222,13 +224,20 @@ void login(struct bill* menup,struct bill* tablep)
     {  
         admin_login(menup,tablep);
     }
+    else if(table_no == 'e')
+    {
+        printf("Exiting... ");
+        Sleep(1000);
+        exit(0);
+    }
     else
     {
         if(menu_status == 1)            //checks if menu has been created or not
         {
             if((tablep + (((int)table_no)-49))->status == 1)
             {
-                printf("Table no: %d",(int)table_no-48);
+                printf("Table no: %d\n",(int)table_no-48);
+                cust_login(menup,tablep);
                 //table_no(tablep+((int)table_no)-1);
             }
             else if(((int)table_no) == 48)
@@ -239,14 +248,15 @@ void login(struct bill* menup,struct bill* tablep)
             }
             else
             {
-                printf("Please enter valid table number");
+                printf("Please enter valid table number\n");
             }
         }
         else
         {
-            printf("The restaurant hasn't opened yet, please wait.");
+            printf("The restaurant hasn't opened yet, please wait.\n");
         }
     }
+    login(menup,tablep);
 }
 
 void admin(struct bill*menup,struct bill*tablep)
@@ -311,13 +321,87 @@ void cust(struct bill*menup,struct bill*tablep)
             edit_order(menup,tablep);
             break;
         case 2:
-            printf("bill(tableno)\n");
+            display_bill(menup,tablep);
             break;
         case 3:
-            printf("Logging out...");
+            printf("Logging out...\n");
             login(menup,tablep);
             break;
         default:
             printf("Invalid input\n");
     }
+
+}
+
+void display_bill(struct bill* menup, struct bill* tablep)
+{
+    int i,j;
+    int quantity=1,sum=0,sno=1,rep=0;
+    printf("S.no Dish                  Cost  Quantity\n");
+    for(i=0;i<tablep->total_dishes;i++)
+    {
+        quantity = 1;
+        rep = 0;
+        for(j=i-1;j>=0;j--)
+        {
+            if(strcmp(tablep->dishes[i].name,tablep->dishes[j].name) == 0)
+            {
+                rep = 1;
+                break;
+            }
+        }
+        if(rep == 0)
+        {
+            for(j=i+1;j<tablep->total_dishes;j++)
+            {
+                if(strcmp(tablep->dishes[i].name,tablep->dishes[j].name) == 0)
+                {
+                    quantity++;
+                }
+            }
+            printf("%4d %-20s %5d  %d\n",sno,tablep->dishes[i].name, tablep->dishes[i].price,quantity);
+            sno++;
+            sum+= tablep->dishes[i].price*quantity;
+        }
+        else
+        {
+            continue;
+        }
+
+        
+    }
+    printf("\n\e[1mTotal amount: %d\e[m",sum);
+}
+
+void view_table(struct bill* menup, struct bill* tablep)
+{
+    printf("\e[1mHere is the order and bill from table no. %d:\e[m\n",tablep->table_no);
+    printf("Bill no: %d",tablep->bill_no);
+    display_bill(menup,tablep);
+    printf("\n Press any key to continue");
+    getchar();
+    admin(menup,tablep);
+}
+
+void cust_login(struct bill* menup, struct bill* tablep)
+{
+    int n;
+    int i;
+    for(i=0;i<5;i++)
+    {
+        printf("Please enter your bill number: \n");
+        scanf("%d",&n);
+        if(n == tablep->bill_no)
+        {
+            printf("Successful login!\n");
+            cust(menup,tablep);
+        }
+        else
+        {
+            printf("please enter correct bill number. If lost, contact manager\n");
+        }
+    }
+    printf("Too many incorrect attempts. Logging out...\n");
+    Sleep(1000);
+    login(menup,tablep-(tablep->table_no + 1));
 }
