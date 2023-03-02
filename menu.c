@@ -9,7 +9,6 @@ BUGS:
 #include<stdlib.h>
 #include<conio.h>
 #include<string.h>
-//#include<unistd.h>
 #include<windows.h>
 #include<ctype.h>
 
@@ -90,7 +89,7 @@ int create_menu(struct bill* menup,struct bill* tablep)
         scanf("\n%c",&check);
     }while(check == 'n');
     menu_status = 1;
-    login(menup,tablep);
+    login(menup,tablep-((tablep->table_no)-1));
 }
 
 void create_order(struct bill* menup, struct bill* tablep)
@@ -104,6 +103,7 @@ void create_order(struct bill* menup, struct bill* tablep)
     printf("\n\e[1mPlease keep note of your bill number.\e[m\n");
     while(check == 'n')
     {
+        i = 0;
         display_menu(menup);
         printf("\nPlease enter the serial number of the items you would like to order (if you want more than one quantity of an item, please enter its serial number twice): \n");
         printf("Please enter 0 when you are done\n");
@@ -162,8 +162,9 @@ void initialise(struct bill* menup,struct bill* tablep)
     for(i=0;i<5;i++)
     {
         (tablep+i)->status = 0;
+        (tablep+i)->table_no = i+1;
     }
-    login(menup,tablep);
+    login(menup,tablep-((tablep->table_no)-1));
 }
 
 void admin_login(struct bill* menup, struct bill* tablep)
@@ -222,7 +223,7 @@ void login(struct bill* menup,struct bill* tablep)
     scanf("\n%c",&table_no);
     if(table_no == 'a')
     {  
-        admin_login(menup,tablep);
+        admin_login(menup,tablep-((tablep->table_no)-1));
     }
     else if(table_no == 'e')
     {
@@ -244,7 +245,7 @@ void login(struct bill* menup,struct bill* tablep)
             {
                 printf("Logging in as a new customer...");
                 Sleep(1000);
-                check_table(menup, tablep);
+                check_table(menup, tablep-((tablep->table_no)-1));
             }
             else
             {
@@ -256,7 +257,7 @@ void login(struct bill* menup,struct bill* tablep)
             printf("The restaurant hasn't opened yet, please wait.\n");
         }
     }
-    login(menup,tablep);
+    login(menup,tablep-((tablep->table_no)-1));
 }
 
 void admin(struct bill*menup,struct bill*tablep)
@@ -296,7 +297,7 @@ void admin(struct bill*menup,struct bill*tablep)
             break;
         case 4:
             printf("Logging out...");
-            login(menup,tablep);
+            login(menup,tablep-((tablep->table_no)-1));
             break;
         default:
             printf("Invalid input\n");
@@ -325,7 +326,7 @@ void cust(struct bill*menup,struct bill*tablep)
             break;
         case 3:
             printf("Logging out...\n");
-            login(menup,tablep);
+            login(menup,tablep-((tablep->table_no)-1));
             break;
         default:
             printf("Invalid input\n");
@@ -374,7 +375,7 @@ void display_bill(struct bill* menup, struct bill* tablep)
     printf("\n\e[1mTotal amount: %d\e[m",sum);
 
     checkout(menup,tablep);
-    login(menup,tablep);
+    login(menup,tablep-((tablep->table_no)-1));
 }
 
 void view_table(struct bill* menup, struct bill* tablep)
