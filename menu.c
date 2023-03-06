@@ -1,8 +1,8 @@
 /*TO DO:
-pay?
+
 
 BUGS: 
-3rd new customer is taken as an existing customer for no reason at all
+
 */
 
 #include<stdio.h>
@@ -68,9 +68,21 @@ void display_menu(struct bill* menup)
 
 void create_menu(struct bill* menup,struct bill* tablep)
 {
-    int i;
+    int i,flag = 0;
+    system("cls");
+    printf("Creating menu...\n");
     printf("Please enter number of dishes on the menu: \n");
-    scanf("%d",&menup->total_dishes);
+    while(flag == 0)
+    {
+        scanf("%d",&menup->total_dishes);
+        flag = 1;
+        if(menup->total_dishes < 1)
+        {
+            printf("Please enter a number greater than or equal to 1\n");
+            flag = 0;
+        }
+        
+    }
     char check;
 
     char dish[20];
@@ -88,23 +100,26 @@ void create_menu(struct bill* menup,struct bill* tablep)
         }
         printf("This is the menu you have entered:\n");
         display_menu(menup);
-        printf("finalize? (y/n)");
+        printf("finalize? (y/n) ");
         scanf("\n%c",&check);
     }while(check == 'n');
     menu_status = 1;
-    login(menup,(tablep-((tablep->table_no)-1)));
+    printf("Menu finalised!\n");
+    Sleep(2000);
+    admin(menup,(tablep-((tablep->table_no)-1)));
 }
 
 void create_order(struct bill* menup, struct bill* tablep)
 {
     char check = 'n';
     int input=1,i=0;
-    //system("cls");
+    int flag = 1;
+    system("cls");
     tablep->status = 1;
     tablep->bill_no = rand()%100+1;
     printf("Table no: %d\n",tablep->table_no);
     printf("Your Bill no is: %d\n",tablep->bill_no);
-    printf("\n\e[1mPlease keep note of your bill number.\e[m\n");
+    printf("\e[1mPlease keep note of your bill number.\e[m\n\n");
     while(check == 'n')
     {
         i = 0;
@@ -113,10 +128,17 @@ void create_order(struct bill* menup, struct bill* tablep)
         printf("Please enter 0 when you are done\n");
         do
         {
-            
-            tablep->dishes[i-1].price = menup->dishes[input-1].price;
-            strcpy(tablep->dishes[i-1].name,menup->dishes[input-1].name);
+            if(flag == 0)
+            {
+                tablep->dishes[i-1].price = menup->dishes[input-1].price;
+                strcpy(tablep->dishes[i-1].name,menup->dishes[input-1].name);
+            }
+            flag = 0;
             scanf("%d",&input);
+            if(input<1 || input>menup->total_dishes)
+            {
+                flag = 1;
+            }
             i++;
         }while(input!=0);
         i--;
@@ -126,6 +148,8 @@ void create_order(struct bill* menup, struct bill* tablep)
         printf("\nfinalize? (y/n)\n");
         scanf("\n%c",&check);
     }
+    printf("Your order has been finalised!");
+    Sleep(2000);
     cust(menup,tablep);
 }
 
@@ -171,8 +195,8 @@ void initialise(struct bill* menup,struct bill* tablep)
     }
     for(i=0;i<5;i++)
     {
-        printf("%d, ",(tablep+i)->table_no);
-        printf("%d, ",(tablep+i)->status);
+        //printf("%d, ",(tablep+i)->table_no);
+        //printf("%d, ",(tablep+i)->status);
     }
     login(menup,tablep);
 }
@@ -189,6 +213,7 @@ void admin_login(struct bill* menup, struct bill* tablep)
         if(!strcmp(password,"password"))
         {
             printf("Successful login!\n");
+            Sleep(2000);
             admin(menup,(tablep-((tablep->table_no)-1)));
             break;
         }
@@ -232,6 +257,7 @@ void login(struct bill* menup,struct bill* tablep)
 
     //log in to tables system
     char table_no;
+    system("cls");
     printf("Please enter your table number(if new, please enter 0)(if admin, please enter a):\n");
     scanf("\n%c",&table_no);
     if(table_no == 'a')
@@ -268,6 +294,7 @@ void login(struct bill* menup,struct bill* tablep)
         else
         {
             printf("The restaurant hasn't opened yet, please wait.\n");
+            Sleep(3000);
         }
     }
     login(menup,tablep-((tablep->table_no)-1));
@@ -277,10 +304,11 @@ void admin(struct bill*menup,struct bill*tablep)
 {
     int n;
     char yesNo;
+    system("cls");
     printf("Welcome, Admin!\n");
     one:
     printf("What action would you like to perform?\n");
-    printf("1. create today's menu\n");
+    printf("1. Create today's menu\n");
     printf("2. View a table's order\n");
     printf("3. Close restraunt\n");
     printf("4. Log out\n");
@@ -289,14 +317,15 @@ void admin(struct bill*menup,struct bill*tablep)
     switch(n)
     {
         case 1:
-            printf("Creating menu\n");
+            
             create_menu(menup,(tablep-((tablep->table_no)-1)));
             break;
         case 2:
-            printf("view_table_order(tableno)\n");
+            //printf("view_table_order(tableno)\n");
+            view_table(menup,tablep);
             break;
         case 3:
-            printf("Are you sure you want to close the restaurant?\n");
+            printf("Are you sure you want to close the restaurant? (y/n)\n");
             scanf("\n%c",&yesNo);
             if(yesNo == 'y')
             {
@@ -320,7 +349,7 @@ void admin(struct bill*menup,struct bill*tablep)
 void cust(struct bill*menup,struct bill*tablep)
 {
     int n;
-    
+    system("cls");
     printf("Welcome, customer!\n");
     printf("What action would you like to perform?\n");
     printf("1. Order more items\n");
@@ -336,6 +365,7 @@ void cust(struct bill*menup,struct bill*tablep)
             break;
         case 2:
             display_bill(menup,tablep);
+            checkout(menup,tablep);
             break;
         case 3:
             printf("Logging out...\n");
@@ -387,18 +417,43 @@ void display_bill(struct bill* menup, struct bill* tablep)
     }
     printf("\n\e[1mTotal amount: %d\e[m",sum);
 
-    checkout(menup,tablep);
-    login(menup,(tablep-((tablep->table_no)-1)));
+    //checkout(menup,tablep);
+    //login(menup,(tablep-((tablep->table_no)-1)));
 }
 
 void view_table(struct bill* menup, struct bill* tablep)
 {
-    printf("\e[1mHere is the order and bill from table no. %d:\e[m\n",tablep->table_no);
-    printf("Bill no: %d",tablep->bill_no);
-    display_bill(menup,tablep);
-    printf("\n Press any key to continue");
-    getchar();
-    admin(menup,(tablep-((tablep->table_no)-1)));
+    int n;
+    char temp;
+    if(menu_status == 0)
+    {
+        printf("Restaurant is not open yet. Please create the menu first. ");
+        Sleep(2000);
+        admin(menup,(tablep-((tablep->table_no)-1)));
+    }
+    
+    printf("Please enter the table number: \n");
+    printf("Press 0 to go back\n");
+    while(1)
+    {
+        scanf("%d",&n);
+        if((tablep+n)->status == 1)
+        {
+            printf("\n\e[1mHere is the order and bill from table no. %d:\e[m\n",(tablep+(n-1))->table_no);
+            printf("Bill no: %d\n",(tablep+(n-1))->bill_no);
+            display_bill(menup,tablep+(n-1));
+            printf("\n Press any key to continue");
+            scanf("\n%c",&temp);
+            admin(menup,(tablep-((tablep->table_no)-1)));
+        }
+        else
+        {
+            if(n>5&&n<0)
+                printf("Invalid table number, please try again \n");
+            else
+                printf("Table is not occupied \n");
+        }
+    }
 }
 
 void cust_login(struct bill* menup, struct bill* tablep)
@@ -407,7 +462,7 @@ void cust_login(struct bill* menup, struct bill* tablep)
     int i;
     for(i=0;i<5;i++)
     {
-        printf("Table no: %d %d\n",tablep->table_no,tablep->bill_no);
+        printf("Table no: %d\n",tablep->table_no);
         printf("Please enter your bill number: \n");
         scanf("%d",&n);
         if(n == tablep->bill_no)
@@ -439,7 +494,9 @@ void checkout(struct bill* menup,struct bill* tablep)
     else if(yesno == 'y')
     {
         printf("Thank you for eating at our restaurant");
+        Sleep(2000);
+        tablep->status = 0;
         login(menup,tablep-((tablep->table_no)-1));
     }
-    tablep->status = 0;
+    
 }
