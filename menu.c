@@ -68,45 +68,41 @@ void display_menu(struct bill* menup)
 
 void create_menu(struct bill* menup,struct bill* tablep)
 {
-    int i,flag = 0;
-    system("cls");
-    printf("Creating menu...\n");
-    printf("Please enter number of dishes on the menu: \n");
-    while(flag == 0)
-    {
-        scanf("%d",&menup->total_dishes);
-        flag = 1;
-        if(menup->total_dishes < 1)
-        {
-            printf("Please enter a number greater than or equal to 1\n");
-            flag = 0;
-        }
-        
-    }
-    char check;
-
-    char dish[20];
     
-    do
-    {
-        printf("Please enter dish name and cost in two different lines\n");
-        for(i=0;i<menup->total_dishes;i++)
-        {
-            //gets(dish);
-            //printf("%d\n",i);
-            
-            scanf("%s %d",dish,&menup->dishes[i].price);
-            strcpy(menup->dishes[i].name,dish);
+    FILE *f1;
+    menup->total_dishes=0;
+    f1 = fopen("menu.txt","r");
+    char ch;
+    int i=0,n=0,mode=0,j=0;
+    char str[20];
+    int num;
+    
+    
+    FILE *fp;
+    fp = fopen("menu.txt", "r"); // assuming the file name is input.txt
+    
+    if (fp == NULL) {
+        printf("Unable to open file.");
+    }
+    else{
+        while (fscanf(fp, "%[^,],%d\n", str, &num) == 2) 
+        { // reading values from file
+            //printf("String: %s\n", str);
+            strcpy(menup->dishes[i].name,str);
+            //printf("Integer: %d\n", num);
+            menup->dishes[i].price = num;
+            menup->total_dishes++;
+            i++;
         }
-        printf("This is the menu you have entered:\n");
-        display_menu(menup);
-        printf("finalize? (y/n) ");
-        scanf("\n%c",&check);
-    }while(check == 'n');
+    }
+    
+    fclose(fp);
+    display_menu(menup);
+    
     menu_status = 1;
     printf("Menu finalised!\n");
     Sleep(2000);
-    admin(menup,(tablep-((tablep->table_no)-1)));
+    login(menup,(tablep-((tablep->table_no)-1)));
 }
 
 void create_order(struct bill* menup, struct bill* tablep)
@@ -193,12 +189,8 @@ void initialise(struct bill* menup,struct bill* tablep)
         (tablep+i)->table_no = i+1;
         
     }
-    for(i=0;i<5;i++)
-    {
-        //printf("%d, ",(tablep+i)->table_no);
-        //printf("%d, ",(tablep+i)->status);
-    }
-    login(menup,tablep);
+    
+    create_menu(menup,tablep);
 }
 
 void admin_login(struct bill* menup, struct bill* tablep)
