@@ -493,7 +493,7 @@ void checkout(struct bill* menup,struct bill* tablep)
     }
     else if(yesno == 'y')
     {
-        printf("Thank you for eating at our restaurant");
+        printf("Thank you for eating at our restaurant.");
         Sleep(2000);
         tablep->status = 0;
         login(menup,tablep-((tablep->table_no)-1));
