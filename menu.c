@@ -44,6 +44,7 @@ void display_bill(struct bill*, struct bill*);
 void view_table(struct bill*, struct bill*);
 void cust_login(struct bill*, struct bill*);
 void checkout(struct bill*, struct bill*);
+void edit_menu(struct bill*, struct bill*);
 
 
 int main()
@@ -68,6 +69,7 @@ void display_menu(struct bill* menup)
 
 void create_menu(struct bill* menup,struct bill* tablep)
 {
+    system("cls");
     FILE *f1;
     menup->total_dishes=0;
     f1 = fopen("menu.txt","r");
@@ -86,9 +88,9 @@ void create_menu(struct bill* menup,struct bill* tablep)
     else{
         while (fscanf(fp, "%[^,],%d\n", str, &num) == 2) 
         { // reading values from file
-            printf("String: %s\n", str);
+            //printf("String: %s\n", str);
             strcpy(menup->dishes[i].name,str);
-            printf("Integer: %d\n", num);
+            //printf("Integer: %d\n", num);
             menup->dishes[i].price = num;
             menup->total_dishes++;
             i++;
@@ -99,7 +101,7 @@ void create_menu(struct bill* menup,struct bill* tablep)
     display_menu(menup);
     
     menu_status = 1;
-    printf("Menu finalised!\n");
+    printf("Menu updated!\n");
     Sleep(2000);
     login(menup,tablep);
 }
@@ -300,7 +302,7 @@ void admin(struct bill*menup,struct bill*tablep)
     printf("Welcome, Admin!\n");
     one:
     printf("What action would you like to perform?\n");
-    printf("1. Create today's menu\n");
+    printf("1. Edit menu\n");
     printf("2. View a table's order\n");
     printf("3. Close restraunt\n");
     printf("4. Log out\n");
@@ -310,7 +312,7 @@ void admin(struct bill*menup,struct bill*tablep)
     {
         case 1:
             
-            create_menu(menup,(tablep-((tablep->table_no)-1)));
+            edit_menu(menup,(tablep-((tablep->table_no)-1)));
             break;
         case 2:
             //printf("view_table_order(tableno)\n");
@@ -491,4 +493,36 @@ void checkout(struct bill* menup,struct bill* tablep)
         login(menup,tablep-((tablep->table_no)-1));
     }
     
+}
+
+void edit_menu(struct bill* menup, struct bill* tablep)
+{
+    int n,i,j;
+    system("cls");
+    display_menu(menup);
+    printf("\nPlease select action to be performed:\n");
+    printf("1. Edit menu\n");
+    printf("2. Save changes to menu\n");
+    printf("3. Exit\n");
+    scanf("%d",&n);
+
+    while(1)
+    {
+        switch(n)
+        {
+            case 1: system("\menu.txt");
+            break;
+        
+            case 2: create_menu(menup,tablep);
+            break;
+
+            case 3: admin(menup,tablep);
+            break;
+
+            default: printf("Invalid input");
+            Sleep(2000);
+            edit_menu(menup,tablep);
+            break;
+        }
+    }
 }
