@@ -51,7 +51,7 @@ int main()
     struct bill menu,table[5];
     struct bill *menup = &menu,*tablep = &table[0];
     
-    initialise(menup,table);    
+    initialise(menup,tablep);    
 }
 
 
@@ -68,7 +68,6 @@ void display_menu(struct bill* menup)
 
 void create_menu(struct bill* menup,struct bill* tablep)
 {
-    
     FILE *f1;
     menup->total_dishes=0;
     f1 = fopen("menu.txt","r");
@@ -87,9 +86,9 @@ void create_menu(struct bill* menup,struct bill* tablep)
     else{
         while (fscanf(fp, "%[^,],%d\n", str, &num) == 2) 
         { // reading values from file
-            //printf("String: %s\n", str);
+            printf("String: %s\n", str);
             strcpy(menup->dishes[i].name,str);
-            //printf("Integer: %d\n", num);
+            printf("Integer: %d\n", num);
             menup->dishes[i].price = num;
             menup->total_dishes++;
             i++;
@@ -102,7 +101,7 @@ void create_menu(struct bill* menup,struct bill* tablep)
     menu_status = 1;
     printf("Menu finalised!\n");
     Sleep(2000);
-    login(menup,(tablep-((tablep->table_no)-1)));
+    login(menup,tablep);
 }
 
 void create_order(struct bill* menup, struct bill* tablep)
@@ -281,6 +280,7 @@ void login(struct bill* menup,struct bill* tablep)
             else
             {
                 printf("Please enter valid table number\n");
+                Sleep(2000);
             }
         }
         else
