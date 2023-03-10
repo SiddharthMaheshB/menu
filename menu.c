@@ -222,26 +222,53 @@ void admin_login(struct bill* menup, struct bill* tablep)
 void edit_order(struct bill* menup, struct bill* tablep)
 {
     char check = 'n';
-    int i,input=1;
+    int i,input=1,j,flag=0,k,p;
+    
+    struct bill temp;
     while(check == 'n')
     {
+        flag = 0;
+        input = 1;
         display_menu(menup);
         printf("\nPlease enter the serial number of the items you would like to order (if you want more than one quantity of an item, please enter its serial number twice): \n");
         printf("Please enter 0 when you are done\n");
-        for(i=tablep->total_dishes;input!=0;i++)
+        
+        for(i=0;input!=0;i++)
         {
-            
-            tablep->dishes[i].price = menup->dishes[input-1].price;
-            strcpy(tablep->dishes[i].name,menup->dishes[input-1].name);
+            if(flag == 1)
+            {
+                temp.dishes[i].price = menup->dishes[input-1].price;
+                strcpy(temp.dishes[i].name,menup->dishes[input-1].name);
+            }
             scanf("%d",&input);
+            flag = 1;
+            if(input<1 || input>menup->total_dishes)
+            {
+                flag = 0;
+                
+            }
         }
-        i--;
-        tablep->total_dishes = i;
+        
         printf("\e[1mThis is your order: \e[m\n");
         display_menu(tablep);
-        printf("\nfinalize? (y/n)\n");
+        for(p=1;p<i;p++)
+        {
+            printf("%5d %-20s %d\n",(tablep->total_dishes)+p,temp.dishes[p].name, temp.dishes[p].price);
+        }
+
+        printf("\nfinalize? (y/n)");
         scanf("\n%c",&check);
+        //printf("%c",check);
     }
+
+    for(j=tablep->total_dishes,k=1;k<i;k++,j++)
+    {
+        //printf("%s\n",temp.dishes[k].name);
+        tablep->dishes[j].price = temp.dishes[k].price;
+        strcpy(tablep->dishes[j].name,temp.dishes[k].name);
+    }
+    tablep->total_dishes = j;
+    Sleep(2000);
     cust(menup,tablep);
 }
 
