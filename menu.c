@@ -198,7 +198,7 @@ void admin_login(struct bill* menup, struct bill* tablep)
 {
     char password[10] = "password";
     int i;
-    printf("Loggin in as admin...\n");
+    printf("Logging in as admin...\n");
     for(i=0;i<5;i++){
         printf("Enter Password: ");
         scanf("%s",password);
@@ -253,6 +253,7 @@ void login(struct bill* menup,struct bill* tablep)
     system("cls");
     printf("Please enter your table number(if new, please enter 0)(if admin, please enter a):\n");
     scanf("\n%c",&table_no);
+    printf("\n");
     if(table_no == 'a')
     {  
         admin_login(menup,(tablep-((tablep->table_no)-1)));
@@ -440,6 +441,10 @@ void view_table(struct bill* menup, struct bill* tablep)
             scanf("\n%c",&temp);
             admin(menup,(tablep-((tablep->table_no)-1)));
         }
+        else if(n==0)
+        {
+            admin(menup,tablep);
+        }
         else
         {
             if(n>5&&n<0)
@@ -504,13 +509,14 @@ void edit_menu(struct bill* menup, struct bill* tablep)
     printf("1. Edit menu\n");
     printf("2. Save changes to menu\n");
     printf("3. Exit\n");
-    scanf("%d",&n);
+    
 
     while(1)
     {
+        scanf("%d",&n);
         switch(n)
         {
-            case 1: system("\menu.txt");
+            case 1: system("menu.txt");
             break;
         
             case 2: create_menu(menup,tablep);
