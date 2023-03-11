@@ -297,7 +297,7 @@ void login(struct bill* menup,struct bill* tablep)
         {
             if((tablep + (((int)table_no)-49))->status == 1)
             {
-                printf("Table no: %d\n",(int)table_no-48);
+                //printf("Table no: %d\n",(int)table_no-48);
                 cust_login(menup,tablep+(((int)table_no)-49));
                 //table_no(tablep+((int)table_no)-1);
             }
@@ -464,7 +464,7 @@ void view_table(struct bill* menup, struct bill* tablep)
             printf("\n\e[1mHere is the order and bill from table no. %d:\e[m\n",(tablep+(n-1))->table_no);
             printf("Bill no: %d\n",(tablep+(n-1))->bill_no);
             display_bill(menup,tablep+(n-1));
-            printf("\n Press any key to continue");
+            printf("\nPress any key to go back");
             scanf("\n%c",&temp);
             admin(menup,(tablep-((tablep->table_no)-1)));
         }
@@ -475,9 +475,19 @@ void view_table(struct bill* menup, struct bill* tablep)
         else
         {
             if(n>5&&n<0)
+            {
                 printf("Invalid table number, please try again \n");
+                printf("\n Press any key to go back");
+                scanf("\n%c",&temp);
+                admin(menup,(tablep-((tablep->table_no)-1)));
+            }
             else
+            {
                 printf("Table is not occupied \n");
+                printf("\n Press any key to go back");
+                scanf("\n%c",&temp);
+                admin(menup,(tablep-((tablep->table_no)-1)));
+            }
         }
     }
 }
