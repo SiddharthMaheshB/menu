@@ -278,7 +278,7 @@ void login(struct bill* menup,struct bill* tablep)
     //log in to tables system
     char table_no;
     system("cls");
-    printf("Please enter your table number(if new, please enter 0)(if admin, please enter a):\n");
+    printf("Please enter your table number(if new, please enter 0)(if admin, please enter a)\nTo exit, enter e:\n");
     scanf("\n%c",&table_no);
     printf("\n");
     if(table_no == 'a')
